@@ -1,0 +1,31 @@
+This article proposes a method to quantitatively measure the resilience of transportation systems 
+using GPS data from taxis. 
+
+The method works by computing the historical distribution of pace (normalized travel times) 
+between various regions of a city and measuring the pace deviations during an unusual event.
+
+Trips are grouped by their geographic locations and times of occurrence. So a large sample of
+trips can be gathered at any point in time. The city is divided into a small number, k, of 
+large regions.The start zone, end zone, and departure time are used to partition all of trips 
+into subsets, T_{i,j,t}. Average pace is computed for each trip subset T_{i,j,t}. Trips are 
+weighted by their distance, since longer trips give more information about the state of traffic.
+P_{i,j,t} = \frac{\sum_r l(r)p(r)}{\sum_r l(r)}=\frac{\sum_r u(r)}{l(r)}.
+where u(r) is the travel time of trip r, l(r) is the metered length of trip r, and p(r)=u(r)/l(r)
+is the pace of trip r. For a fixed value of t, all k^2 (there are k regions) distance-weighted 
+average paces collectively form the mean pace vector, a.
+
+The vehicle counts drops significantly, it is difficult to determine whether this is due to 
+increased congestion or decreased demand. However, an increase in pace indicates congestion, while
+a decrease in pace indicates decreased demand.
+
+The mean pace vector a(t) has a strongly periodic weekly pattern. Author defined the reference
+set Q_t for all times t. This set contains all of the mean pace vectors which occur at the same
+point in the periodic pattern as a(t), except for a(t) itself. Then the expected value of the mean
+pace vector \mu(t) as well as the covariance matrix \Sigma(t) can be calculated as
+\mu(t) = \frac{1}{|Q_t|}\sum_{a in Q_t} a
+\Sigma(t) = \frac{|Q_t|}{|Q_t|-1}(\sum_{a in Q_t} aa^T/|Q_t| - \mu(t)\mu(t)^T)
+Then for each a(t), the Mahalanobis distance is calculated as M(t)
+M(t) = sqrt((a(t) - \mu(t))^T\Sigma(t)^{-1}(a(t) - \mu(t)))
+And the a threshold is set to be the 95% quantiles of M(t)
+
+
