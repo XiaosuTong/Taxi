@@ -109,7 +109,7 @@ job$reduce <- expression(
     }else{
       count <- sum(value[seq(1, length(value), by=2)])
       pace <- sum(value[seq(2, length(value), by=2)])
-      rhcollect()
+      rhcollect(reduce.key, c(count, pace))
     }
   }
 )
