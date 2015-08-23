@@ -13,7 +13,9 @@ job$map <- expression({
     dow = weekdays(as.Date(line[6]), abbreviate = TRUE)
     woy = week((as.Date(line[6])))
     hour = as.numeric(pick[4]) + 1
-    rhcollect(c(woy, dow, hour), 1)
+    month = as.numeric(pick[2])
+    day = as.numeric(pick[3])
+    rhcollect(c(woy, dow, hour, month, day), 1)
 	})
 })
 job$reduce <- expression(
@@ -37,7 +39,7 @@ job$input <- rhfmt(
 	type = "text"
 ) 
 job$output <- rhfmt(
-	file.path(output.dir, "tmp"),
+	file.path(output.dir, "hourcounts"),
 	type = "sequence"
 )
 job$mapred <- list(
@@ -86,7 +88,7 @@ job$map <- expression({
     if(weighted) { 
       rhcollect(c(woy, dow, hour), c(1, triptime, dist))
     }else{
-      rhcollect(c(woy, dow, hour), c(1, pace=triptime/dist))
+      if(dist!=0){rhcollect(c(woy, dow, hour), c(1, pace=triptime/dist))}
     }   
   })
 })
@@ -108,7 +110,7 @@ job$reduce <- expression(
       rhcollect(reduce.key, c(count, dist, triptime))
     }else{
       count <- sum(value[seq(1, length(value), by=2)])
-      pace <- sum(value[seq(2, length(value), by=2)])
+      pace <- sum(value[seq(2, length(value), by=2)], na.rm=TRUE)
       rhcollect(reduce.key, c(count, pace))
     }
   }
@@ -138,3 +140,4 @@ job$jobname <- file.path(output.dir, par)
 job$readback <- FALSE
 job$combiner <- TRUE
 job.mr <- do.call("rhwatch", job)
+
